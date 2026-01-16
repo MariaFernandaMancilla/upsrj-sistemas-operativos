@@ -1,91 +1,116 @@
 #!/bin/bash
 
-
+# ============================================================
 # Práctica: Exploración del Scheduler Real en Linux
 # Alumna: Maria Fernanda Barrientos Mancilla
 # Sistema: Ubuntu 22.04
 # Scheduler: Completely Fair Scheduler (CFS)
+# ============================================================
 
+echo "EXPLORACION DEL SCHEDULER REAL DE LINUX"
+echo "--------------------------------------"
+echo "Linux no implementa directamente FCFS, SJF o RR."
+echo "Utiliza un scheduler moderno llamado CFS."
+echo
 
-echo " EXPLORACIÓN DEL SCHEDULER REAL DE LINUX"
-echo "En esta práctica se analiza el scheduler real de Linux."
-echo "Linux no implementa directamente FCFS, SJF o RR,"
-echo "sino un scheduler moderno llamado CFS."
-echo ""
+# ------------------------------------------------------------
+# PASO 1: LOCALIZAR EL CODIGO FUENTE DEL KERNEL
+# ------------------------------------------------------------
 
-
-# PASO 1: Ubicación del código fuente del kernel
-
-echo "PASO 1: Localizando el código fuente del kernel"
-echo "El código fuente del kernel NO está en /home"
-echo "Normalmente se encuentra en el directorio /usr/src"
-echo ""
+echo "PASO 1: Localizando el codigo fuente del kernel"
+echo "El kernel NO se encuentra en /home"
+echo "Normalmente se localiza en /usr/src"
+echo
 
 pwd
 cd /usr/src || exit
 
 echo "Contenido de /usr/src:"
 ls
-echo ""
+echo
 
+# ------------------------------------------------------------
+# PASO 2: NAVEGAR A LA ESTRUCTURA DEL KERNEL
+# ------------------------------------------------------------
 
-# PASO 2: Navegar a la carpeta de scheduling
+echo "PASO 2: Entrando al codigo fuente del kernel"
+echo "Se utiliza el kernel source descomprimido"
+echo
 
-echo "PASO 2: Navegando a la carpeta de scheduling"
-echo "Dentro del kernel, la planificación de procesos"
-echo "se encuentra en kernel/sched"
-echo ""
+cd linux-source-5.15.0 || exit
 
-# Seleccionar una carpeta de linux-headers (sin usar comandos no permitidos)
-set -- linux-headers-*-generic
-KERNEL_DIR=$1
-
-echo "Kernel seleccionado:"
-echo "$KERNEL_DIR"
-echo ""
-
-cd "$KERNEL_DIR/kernel/sched" || exit
-
-echo "Ruta actual:"
+echo "Directorio actual:"
 pwd
-echo ""
+echo
 
-echo "Archivos dentro de sched:"
+# ------------------------------------------------------------
+# PASO 3: LOCALIZAR EL SCHEDULER PRINCIPAL
+# ------------------------------------------------------------
+
+echo "PASO 3: Localizando el scheduler principal"
+echo "El scheduler se encuentra en kernel/sched"
+echo
+
+cd kernel/sched || exit
+
+echo "Archivos del scheduler:"
 ls
-echo ""
+echo
+
+echo "El archivo fair.c implementa el Completely Fair Scheduler (CFS)"
+echo
+
+# ------------------------------------------------------------
+# PASO 4: MOSTRAR CODIGO FUENTE REAL DEL SCHEDULER
+# ------------------------------------------------------------
+
+echo "PASO 4: Mostrando el codigo fuente real del scheduler"
+echo "Archivo: kernel/sched/fair.c"
+echo
+
+echo "Aqui realizamos un cat a fair > cat fair.c"
 
 
-# PASO 3: Scheduler principal
+# ------------------------------------------------------------
+# ANALISIS DEL CODIGO (DOCUMENTADO EN EL SCRIPT)
+# ------------------------------------------------------------
 
-echo "PASO 3: Identificando el scheduler principal"
-echo "El archivo fair.c implementa el"
-echo "Completely Fair Scheduler (CFS),"
-echo "que es el scheduler por defecto de Linux."
-echo ""
-
-# PASO 4: Mostrar el código real del scheduler
-
-echo "PASO 4: Mostrando el código fuente real del scheduler"
-echo "Archivo: fair.c"
-echo ""
-
-cat fair.c
-
-echo ""
-
-echo " FIN DE LA EXPLORACIÓN DEL SCHEDULER"
-
-
-
-# PREGUNTA DE REFLEXIÓN (RESPUESTA)
-
-# ¿Por qué Linux no implementa directamente FCFS, SJF o RR?
+# El archivo fair.c contiene comentarios del propio kernel
+# donde se explica el funcionamiento del Completely Fair Scheduler.
 #
-# Linux no implementa directamente FCFS, SJF o RR porque
-# estos algoritmos son modelos teóricos simplificados.
-# En un sistema operativo real se requiere equidad,
-# baja latencia, soporte para múltiples núcleos y buen
-# rendimiento para procesos interactivos.
-# El Completely Fair Scheduler (CFS) permite repartir
-# el tiempo de CPU de manera más justa y eficiente
-# que los algoritmos clásicos vistos en clase.
+# Se identifican conceptos como:
+# - Fairness: reparto justo del tiempo de CPU
+# - Virtual Runtime (vruntime): tiempo virtual consumido por un proceso
+#
+# Relacion con algoritmos teoricos:
+#
+# FCFS:
+# - Ejecuta procesos en orden de llegada
+# - CFS no sigue ese orden
+#
+# SJF:
+# - Requiere conocer la duracion del proceso
+# - CFS no conoce el tiempo real de ejecucion
+#
+# Round Robin:
+# - Usa un quantum fijo
+# - CFS ajusta dinamicamente el tiempo de ejecucion
+
+# ------------------------------------------------------------
+# PREGUNTA DE REFLEXION (OBLIGATORIA)
+# ------------------------------------------------------------
+
+# ¿Por que Linux no implementa directamente FCFS, SJF o RR?
+#
+# Porque son algoritmos teoricos y simplificados.
+# En sistemas reales existen miles de procesos,
+# no se conoce su tiempo de ejecucion,
+# y se requiere equidad, eficiencia y escalabilidad.
+#
+# El CFS es una solucion practica para sistemas modernos.
+
+echo
+echo "--------------------------------------"
+echo "FIN DE LA PRACTICA"
+echo "Scheduler analizado: CFS"
+echo "--------------------------------------"
